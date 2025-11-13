@@ -15,21 +15,23 @@ def process_list_in_thread(thread_name, sublist):
         print(f"{thread_name} processing: {item}")
     print(f"{thread_name} finished.")
 
-def assign_lists_to_threads(data, lst):
-    def divide_list(lst, n=2):  # Changed from n=6 to n=2 to split the list into two parts
-        """Divide the list into n sublists as evenly as possible."""
-        k, m = divmod(len(lst), n)
-        return [lst[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]  # Divide into 2 parts
 
-    divided_lists = divide_list(lst, 2)  # Use 2 sublists now
+def assign_lists_to_threads(data, lst):
+    """
+    Divide the list into 2 parts, create a thread for each, and return the threads.
+    """
+    def divide_list(lst, n=2):
+        k, m = divmod(len(lst), n)
+        return [lst[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
+
+    divided_lists = divide_list(lst, 2)
     threads = []
 
     for i, sublist in enumerate(divided_lists):
-        print(len(sublist))  # Print the length of each sublist
-        thread = threading.Thread(target=data.data_scrapping, args=(sublist,))  # Assuming data.data_scrapping method
+        thread = threading.Thread(target=data.data_scrapping, args=(sublist,))
         threads.append(thread)
         thread.start()
 
-    for thread in threads:
-        thread.join()  # Wait for all threads to finish
+    return threads  # important: return the list of threads
+
 

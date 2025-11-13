@@ -25,30 +25,27 @@ time.sleep(5)
 
 wait = WebDriverWait(driver, 10)
 
-url_extractor = Extract_urls(driver=driver,wait=wait,ec=EC)
-
+# --- Step 1: Extract URLs ---
+url_extractor = Extract_urls(driver=driver, wait=wait, ec=EC)
 url_extractor.load_data()
 lst = url_extractor.get_urls()
+driver.quit()
 
-data = Extract()
+# --- Step 2: Scrape job details using threads ---
+data = Extract(final_file="cleaned_job_titles.csv")
+threads = assign_lists_to_threads(data, lst[:11])
+for t in threads:
+    t.join()
 
-# use threads to scrape data 
-assign_lists_to_threads(data,lst[:11])
+# --- Step 2: Save final scraped data ---
+data.save_to_csv()  # everything is in one CSV
 
-# collect al csv files to one csv file
-collect_csv()
+# --- Step 3: Run AI mapping on final CSV ---
+give_to_ai("cleaned_job_titles.csv")
 
-# take skils and tiltles from file and give to ai to identify the actual title
-give_to_ai()
+# --- Step 4: Clean unknown titles and finalize ---
+cleaned_data_to_csv(final_file="cleaned_job_titles.csv")  # merge AI titles into the same CSV
 
-# marge title and data and clean unknown titles
 
-cleaned_data_to_csv()
-
-# # save to data base
+# --- Step 6: Push to database ---
 # insert_data_to_sql()
-
-
-
-
-
